@@ -1023,7 +1023,7 @@
             }
             if (line) descLines++;
 
-            const H = padding*2 + 32 + imgSize + 40 + 32 + 36 + descLines*30 + 12 + 32 + 52 + 40 + 80 + 24 + 32;
+            const H = padding*2 + 32 + imgSize + 40 + 32 + 36 + descLines*30 + 12 + 32 + 52 + 40 + 80 + 24 + 18 + 32;
 
             const canvas = document.createElement('canvas');
             canvas.width = W; canvas.height = H;
@@ -1107,6 +1107,10 @@
             ctx.fillStyle = '#aaa';
             ctx.font = '13px -apple-system, sans-serif';
             ctx.fillText('扫码测测你的世界杯球格', W/2, curY);
+            curY += 18;
+            ctx.fillStyle = '#bbb';
+            ctx.font = '12px -apple-system, sans-serif';
+            ctx.fillText('zztaccount.github.io/worldcup-quiz', W/2, curY);
 
             // Show
             canvas.toBlob(async (blob) => {
