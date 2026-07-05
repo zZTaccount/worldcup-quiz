@@ -272,13 +272,6 @@
             letter-spacing: -0.02em;
         }
 
-        .result-subtitle {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-dim);
-            letter-spacing: 0.05em;
-            margin-bottom: 16px;
-        }
 
         .result-desc {
             font-size: 14px;
@@ -436,7 +429,6 @@
         <div class="result-card">
             <img class="result-img" id="result-img" src="" alt="">
             <div class="result-name" id="result-name"></div>
-            <div class="result-subtitle" id="result-subtitle"></div>
             <div class="result-desc" id="result-desc"></div>
             <div class="result-tags" id="result-tags"></div>
             <div class="result-quote" id="result-quote"></div>
@@ -982,7 +974,6 @@
 
             document.getElementById('result-img').src = avatars[maxKey];
             document.getElementById('result-name').textContent = p.name;
-            document.getElementById('result-subtitle').textContent = p.sub;
             document.getElementById('result-desc').textContent = p.desc;
             document.getElementById('result-quote').textContent = p.quote;
 
@@ -1023,7 +1014,7 @@
             }
             if (line) descLines++;
 
-            const H = padding*2 + 32 + imgSize + 40 + 32 + 36 + descLines*30 + 12 + 32 + 52 + 40 + 80 + 24 + 18 + 32;
+            const H = padding*2 + 32 + imgSize + 40 + 36 + descLines*30 + 12 + 32 + 52 + 40 + 80 + 24 + 18 + 32;
 
             const canvas = document.createElement('canvas');
             canvas.width = W; canvas.height = H;
@@ -1058,12 +1049,6 @@
             ctx.font = 'bold 40px -apple-system, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(p.name, W/2, curY);
-
-            // Subtitle
-            curY += 32;
-            ctx.fillStyle = '#888';
-            ctx.font = '18px -apple-system, sans-serif';
-            ctx.fillText(p.sub, W/2, curY);
 
             // Description
             curY += 36;
