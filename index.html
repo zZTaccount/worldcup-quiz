@@ -1000,9 +1000,32 @@
 
         function restartQuiz() { startQuiz(); }
 
+        const QR_SRC = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADIAQMAAACXljzdAAAABlBMVEX///8AAABVwtN+AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABiUlEQVRYhdWYsZWEMAxE5UdASAmUQmdrSqMUSiAk4KGbGfmO24AYoYDn1d8Arccjec1uozrDuh3rs+O6KHMmIB+9YPF98BnPcbFyMJWcoIa1Gp7IkdRyDO7zGwjrQQ5LexEx67dJCpr8FSS0c/Sbmfuu9ZeqHiRxGkmm+eykkK9zmpNcAXLjdPkI61n5gEL86FdWtaGq5OToXZ5n9Ot91Bas0k5iAs/b+FF+jW8tFb1m1TYkJhWncpzDr8FHl4fELjxNGKPjV4YrO986EnNuQlf22ZuHuF8KyUzC56gT+DVOI3PsJZaaQDsDZcx6mnbUvXOTQiJ9T+gsdD6D86nSxORjPV5fzqf5DjpCPZOmjccJpp8xpnr4m7VZedJpTEzscj717ZiRanLSblByPilau+BnahJRNG2E8xk9JDmpcr745YsqiQnfUpOY/cP54l5issIzA/m96SnHSei/dpIT3qbibl3lyu8g3oIK8VB3amJN0XS+Tr0GVrjU3OTvNOrfInZFa/NoZnIbP59E7y1sZJN0AAAAAElFTkSuQmCC';
+
         async function shareResult() {
+            const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+            const maxKey = sorted[0][0];
+            const p = personalities[maxKey];
+
+            // Pre-calculate height
+            const W = 720;
+            const padding = 32;
+            const imgSize = 200;
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = W;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.font = '20px -apple-system, sans-serif';
+            const maxWidth = W - 64 - 80;
+            let descLines = 0, line = '';
+            for (let i = 0; i < p.desc.length; i++) {
+                line += p.desc[i];
+                if (tempCtx.measureText(line).width > maxWidth) { descLines++; line = ''; }
+            }
+            if (line) descLines++;
+
+            const H = padding*2 + 32 + imgSize + 40 + 32 + 36 + descLines*30 + 12 + 32 + 52 + 40 + 80 + 24 + 32;
+
             const canvas = document.createElement('canvas');
-            const W = 720, H = 1280;
             canvas.width = W; canvas.height = H;
             const ctx = canvas.getContext('2d');
 
@@ -1011,23 +1034,17 @@
             ctx.fillRect(0, 0, W, H);
 
             // Card
-            const cx = 40, cy = 60, cw = W - 80, ch = H - 120;
+            const cx = padding, cy = padding, cw = W - padding*2, ch = H - padding*2;
             ctx.fillStyle = '#ffffff';
             ctx.beginPath();
             ctx.roundRect(cx, cy, cw, ch, 20);
             ctx.fill();
 
-            // Get result data
-            const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
-            const maxKey = sorted[0][0];
-            const p = personalities[maxKey];
-
             // Draw avatar
             const img = new Image();
             img.src = avatars[maxKey];
             await new Promise(r => { img.onload = r; img.onerror = r; });
-            const imgSize = 240;
-            const imgX = (W - imgSize) / 2, imgY = cy + 40;
+            const imgX = (W - imgSize) / 2, imgY = cy + 32;
             ctx.save();
             ctx.beginPath();
             ctx.roundRect(imgX, imgY, imgSize, imgSize, 16);
@@ -1036,61 +1053,66 @@
             ctx.restore();
 
             // Name
+            let curY = imgY + imgSize + 40;
             ctx.fillStyle = '#1a1a1a';
-            ctx.font = 'bold 42px -apple-system, sans-serif';
+            ctx.font = 'bold 40px -apple-system, sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText(p.name, W/2, imgY + imgSize + 60);
+            ctx.fillText(p.name, W/2, curY);
 
             // Subtitle
+            curY += 32;
             ctx.fillStyle = '#888';
-            ctx.font = '20px -apple-system, sans-serif';
-            ctx.fillText(p.sub, W/2, imgY + imgSize + 95);
+            ctx.font = '18px -apple-system, sans-serif';
+            ctx.fillText(p.sub, W/2, curY);
 
-            // Description - word wrap
+            // Description
+            curY += 36;
             ctx.fillStyle = '#555';
-            ctx.font = '22px -apple-system, sans-serif';
-            const maxWidth = cw - 80;
-            let descY = imgY + imgSize + 140;
-            const desc = p.desc;
-            let line = '';
-            for (let i = 0; i < desc.length; i++) {
-                line += desc[i];
+            ctx.font = '20px -apple-system, sans-serif';
+            line = '';
+            for (let i = 0; i < p.desc.length; i++) {
+                line += p.desc[i];
                 if (ctx.measureText(line).width > maxWidth) {
-                    ctx.fillText(line, W/2, descY);
-                    descY += 34;
+                    ctx.fillText(line, W/2, curY);
+                    curY += 30;
                     line = '';
                 }
             }
-            if (line) { ctx.fillText(line, W/2, descY); descY += 34; }
+            if (line) { ctx.fillText(line, W/2, curY); curY += 30; }
 
             // Tags
-            descY += 20;
-            ctx.font = '18px -apple-system, sans-serif';
+            curY += 12;
+            ctx.font = '17px -apple-system, sans-serif';
             ctx.fillStyle = '#5a7a30';
-            const tagStr = p.traits.map(t => '#' + t).join('  ');
-            ctx.fillText(tagStr, W/2, descY);
+            ctx.fillText(p.traits.map(t => '#' + t).join('  '), W/2, curY);
 
-            // Quote
-            descY += 50;
+            // Quote box
+            curY += 32;
             ctx.fillStyle = '#f5f3ef';
             ctx.beginPath();
-            ctx.roundRect(cx + 40, descY - 10, cw - 80, 70, 12);
+            ctx.roundRect(cx + 32, curY - 6, cw - 64, 52, 10);
             ctx.fill();
             ctx.fillStyle = '#777';
-            ctx.font = 'italic 19px -apple-system, sans-serif';
-            ctx.fillText(p.quote, W/2, descY + 35);
+            ctx.font = '17px -apple-system, sans-serif';
+            ctx.fillText(p.quote, W/2, curY + 26);
 
-            // Footer
-            ctx.fillStyle = '#bbb';
-            ctx.font = '16px -apple-system, sans-serif';
-            ctx.fillText('世界杯球格测试 · 2026', W/2, ch + cy - 20);
+            // QR code + text
+            curY += 52 + 40;
+            const qrImg = new Image();
+            qrImg.src = QR_SRC;
+            await new Promise(r => { qrImg.onload = r; qrImg.onerror = r; });
+            const qrSize = 80;
+            ctx.drawImage(qrImg, W/2 - qrSize/2, curY, qrSize, qrSize);
+            curY += qrSize + 16;
+            ctx.fillStyle = '#aaa';
+            ctx.font = '13px -apple-system, sans-serif';
+            ctx.fillText('扫码测测你的世界杯球格', W/2, curY);
 
             // Show
             canvas.toBlob(async (blob) => {
                 const url = URL.createObjectURL(blob);
                 document.getElementById('share-img').src = url;
                 document.getElementById('share-overlay').classList.add('active');
-                document.getElementById('share-overlay').dataset.blob = '';
                 window._shareBlob = blob;
             }, 'image/png');
         }
