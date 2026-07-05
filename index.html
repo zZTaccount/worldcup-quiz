@@ -6,16 +6,16 @@
     <title>测测你的世界杯球格</title>
     <style>
         :root {
-            --bg: #f8f6f3;
+            --bg: #f5f3ef;
             --card: #ffffff;
-            --border: #e8e4df;
             --text: #1a1a1a;
-            --text-dim: #7a7570;
-            --pop: #ff5722;
-            --pop-light: #fff0ec;
-            --pop2: #6c5ce7;
-            --pop2-light: #f0eeff;
-            --radius: 20px;
+            --text-dim: #7a7a7a;
+            --text-light: #aaa;
+            --accent: #c8e64a;
+            --accent2: #7b9cff;
+            --accent3: #ff8a6b;
+            --radius: 16px;
+            --radius-lg: 24px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -31,229 +31,238 @@
         .screen {
             display: none;
             min-height: 100dvh;
-            padding: 48px 24px env(safe-area-inset-bottom, 24px);
+            padding: 0 24px env(safe-area-inset-bottom, 24px);
             position: relative;
+            overflow: hidden;
         }
 
         .screen.active {
             display: flex;
             flex-direction: column;
-            animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(24px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        @keyframes pop {
-            0% { transform: scale(0.8); opacity: 0; }
-            60% { transform: scale(1.05); }
-            100% { transform: scale(1); opacity: 1; }
-        }
+        .deco-circle { display: none; }
+        .deco-hex { display: none; }
 
         /* ===== INTRO ===== */
-        #intro-screen { justify-content: center; align-items: center; text-align: center; gap: 28px; }
+        #intro-screen {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            gap: 40px;
+            padding-top: 80px;
+            padding-bottom: 60px;
+        }
 
-        .intro-emoji {
-            font-size: 72px;
-            line-height: 1;
-            animation: bounce 2s ease-in-out infinite;
+        .intro-content {
+            position: relative;
+            z-index: 1;
+            max-width: 320px;
+        }
+
+        .intro-phase {
+            font-size: 12px;
+            color: var(--text-dim);
+            letter-spacing: 0.05em;
+            margin-bottom: 20px;
+        }
+
+        .intro-title {
+            font-size: 38px;
+            font-weight: 800;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+        }
+
+        .intro-sub {
+            font-size: 15px;
+            color: var(--text-dim);
+            line-height: 1.7;
         }
 
         .intro-badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--pop);
-            background: var(--pop-light);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-dim);
+            background: var(--card);
             padding: 8px 16px;
             border-radius: 100px;
-            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            margin-bottom: 24px;
         }
 
-        .intro-badge::before {
-            content: '🏆';
-            font-size: 14px;
-        }
-
-        .intro-title {
-            font-size: 34px;
-            font-weight: 900;
-            line-height: 1.35;
-            margin-bottom: 12px;
-        }
-
-        .intro-title em {
-            font-style: normal;
-            background: linear-gradient(135deg, var(--pop), var(--pop2));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .intro-sub {
-            font-size: 14px;
-            color: var(--text-dim);
-            line-height: 1.7;
-            max-width: 280px;
-        }
-
-        .btn-main {
+        .btn-start {
+            position: relative;
+            z-index: 1;
             width: 100%;
             max-width: 300px;
             padding: 18px 32px;
             font-family: inherit;
             font-size: 16px;
-            font-weight: 900;
-            color: #fff;
-            background: linear-gradient(135deg, var(--pop), #ff8a65);
+            font-weight: 700;
+            color: var(--text);
+            background: var(--card);
             border: none;
-            border-radius: var(--radius);
+            border-radius: var(--radius-lg);
             cursor: pointer;
-            box-shadow: 0 8px 24px rgba(255, 87, 34, 0.25);
-            transition: transform 0.15s;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            transition: transform 0.15s, box-shadow 0.15s;
         }
 
-        .btn-main:active { transform: scale(0.95); }
+        .btn-start:active {
+            transform: scale(0.96);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
 
         /* ===== QUESTION ===== */
-        #question-screen { justify-content: flex-start; padding-top: 56px; }
-
-        .q-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 36px;
+        #question-screen {
+            justify-content: flex-start;
+            padding-top: 60px;
         }
 
-        .q-num {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--pop);
-            background: var(--pop-light);
-            padding: 4px 12px;
-            border-radius: 100px;
-            white-space: nowrap;
-        }
-
-        .q-bar {
-            flex: 1;
-            height: 6px;
-            background: var(--border);
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        .q-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--pop), var(--pop2));
-            border-radius: 6px;
-            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        .q-phase {
+            font-size: 12px;
+            color: var(--text-dim);
+            letter-spacing: 0.02em;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
         }
 
         .q-text {
-            font-size: 21px;
-            font-weight: 900;
-            line-height: 1.5;
-            margin-bottom: 28px;
-            color: var(--text);
+            font-size: 28px;
+            font-weight: 800;
+            line-height: 1.4;
+            letter-spacing: -0.02em;
+            margin-bottom: 36px;
+            position: relative;
+            z-index: 1;
+            max-width: 320px;
         }
 
-        .q-options { display: flex; flex-direction: column; gap: 10px; }
+        .q-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
 
         .q-option {
             width: 100%;
-            padding: 16px 18px;
+            padding: 18px 20px;
             font-family: inherit;
             font-size: 14px;
             font-weight: 400;
             color: var(--text);
             background: var(--card);
-            border: 2px solid var(--border);
-            border-radius: 14px;
+            border: none;
+            border-radius: var(--radius);
             cursor: pointer;
             text-align: left;
             line-height: 1.6;
-            transition: all 0.15s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .q-option:active {
             transform: scale(0.97);
-            border-color: var(--pop);
-            background: var(--pop-light);
+            background: #f0f8e8;
         }
 
         .q-option.selected {
-            border-color: var(--pop);
-            background: var(--pop-light);
+            background: #eef6e0;
+            box-shadow: 0 2px 12px rgba(180, 210, 80, 0.15);
+        }
+
+        .q-progress {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            gap: 6px;
+            margin-top: auto;
+            padding: 24px 0;
+            justify-content: center;
+        }
+
+        .q-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ddd;
+            transition: all 0.3s;
+        }
+
+        .q-dot.active {
+            width: 24px;
+            border-radius: 4px;
+            background: var(--text);
+        }
+
+        .q-dot.done {
+            background: var(--accent);
         }
 
         /* ===== RESULT ===== */
-        #result-screen { justify-content: center; align-items: center; padding: 32px 20px; }
+        #result-screen {
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
 
         .result-card {
             width: 100%;
             max-width: 340px;
             background: var(--card);
-            border: 2px solid var(--border);
-            border-radius: 28px;
-            padding: 32px 24px 28px;
+            border-radius: var(--radius-lg);
+            padding: 40px 28px 32px;
             text-align: center;
             position: relative;
-            overflow: hidden;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.06);
-            animation: pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+            z-index: 1;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.06);
+            animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
         }
 
-        .result-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: linear-gradient(90deg, var(--pop), var(--pop2), #00cec9);
-        }
-
-        .result-avatar {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
+        .result-img {
+            width: 200px;
+            height: 200px;
             margin: 0 auto 16px;
-            border: 4px solid var(--border);
+            display: block;
+            border-radius: 20px;
             object-fit: cover;
-            animation: pop 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
         }
 
         .result-name {
             font-size: 28px;
-            font-weight: 900;
+            font-weight: 800;
             margin-bottom: 6px;
             line-height: 1.2;
+            letter-spacing: -0.02em;
         }
 
         .result-subtitle {
             font-size: 12px;
-            font-weight: 700;
-            color: var(--pop);
-            letter-spacing: 0.08em;
+            font-weight: 600;
+            color: var(--text-dim);
+            letter-spacing: 0.05em;
             margin-bottom: 16px;
-            text-transform: uppercase;
         }
 
         .result-desc {
             font-size: 14px;
             color: var(--text-dim);
-            line-height: 1.8;
-            margin-bottom: 16px;
+            line-height: 1.9;
+            margin-bottom: 20px;
         }
 
         .result-tags {
@@ -261,84 +270,86 @@
             gap: 8px;
             flex-wrap: wrap;
             justify-content: center;
-            margin-bottom: 16px;
+            margin-bottom: 24px;
         }
 
         .result-tag {
             font-size: 12px;
-            font-weight: 700;
+            font-weight: 600;
             padding: 6px 14px;
-            background: var(--pop2-light);
+            background: #f0f5e4;
             border-radius: 100px;
-            color: var(--pop2);
+            color: #5a7a30;
         }
 
         .result-quote {
             font-size: 13px;
             color: var(--text-dim);
             line-height: 1.7;
-            padding: 14px 16px;
+            padding: 16px;
             background: var(--bg);
             border-radius: 12px;
             font-style: italic;
         }
 
-        .result-quote::before { content: '💬 '; }
-
         .result-footer {
-            margin-top: 14px;
+            margin-top: 16px;
             font-size: 11px;
-            color: var(--text-dim);
-            opacity: 0.6;
+            color: var(--text-light);
         }
 
-        .btn-ghost {
+        .btn-again {
             margin-top: 20px;
+            position: relative;
+            z-index: 1;
             width: 100%;
             max-width: 340px;
             padding: 16px;
             font-family: inherit;
             font-size: 14px;
-            font-weight: 700;
+            font-weight: 600;
             color: var(--text-dim);
             background: var(--card);
-            border: 2px solid var(--border);
+            border: none;
             border-radius: var(--radius);
             cursor: pointer;
-            transition: all 0.15s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: transform 0.15s;
         }
 
-        .btn-ghost:active { transform: scale(0.97); border-color: var(--pop); color: var(--pop); }
+        .btn-again:active { transform: scale(0.97); }
 
         @media (min-width: 390px) {
-            .intro-title { font-size: 38px; }
-            .intro-emoji { font-size: 80px; }
+            .intro-title { font-size: 42px; }
+            .q-text { font-size: 30px; }
         }
     </style>
 </head>
 <body>
+    <!-- INTRO -->
     <div class="screen active" id="intro-screen">
-        <div class="intro-emoji">⚽</div>
-        <div>
-            <span class="intro-badge">2026 世界杯球格测试</span>
-            <h1 class="intro-title">测测你的<br><em>世界杯球格</em></h1>
-            <p class="intro-sub">12道题，找到你在世界杯里的灵魂角色。<br>不需要懂球，只需要做自己。</p>
+        <div class="intro-content">
+            <span class="intro-badge">⚽ 2026 世界杯球格测试</span>
+            <div class="intro-phase">Personality Quiz</div>
+            <h1 class="intro-title">你在世界杯里<br>是什么角色？</h1>
+            <p class="intro-sub">12道题，找到你的足球灵魂人格。<br>不懂球也能玩。</p>
         </div>
-        <button class="btn-main" onclick="startQuiz()">开始测试</button>
+
+        <button class="btn-start" onclick="startQuiz()">开始测试</button>
     </div>
 
+    <!-- QUESTION -->
     <div class="screen" id="question-screen">
-        <div class="q-header">
-            <span class="q-num" id="q-num">1/12</span>
-            <div class="q-bar"><div class="q-bar-fill" id="q-bar-fill"></div></div>
-        </div>
+        <div class="q-phase" id="q-phase">第 1 题 · 共 12 题</div>
         <div class="q-text" id="q-text"></div>
         <div class="q-options" id="q-options"></div>
+        <div class="q-progress" id="q-progress"></div>
     </div>
 
+    <!-- RESULT -->
     <div class="screen" id="result-screen">
         <div class="result-card">
-            <img class="result-avatar" id="result-avatar" src="" alt="">
+            <img class="result-img" id="result-img" src="" alt="">
             <div class="result-name" id="result-name"></div>
             <div class="result-subtitle" id="result-subtitle"></div>
             <div class="result-desc" id="result-desc"></div>
@@ -346,7 +357,7 @@
             <div class="result-quote" id="result-quote"></div>
             <div class="result-footer">世界杯球格测试 · 2026</div>
         </div>
-        <button class="btn-ghost" onclick="restartQuiz()">再测一次</button>
+        <button class="btn-again" onclick="restartQuiz()">再测一次</button>
     </div>
 
     <script>
@@ -801,10 +812,21 @@
             renderQuestion();
         }
 
+        function renderDots() {
+            const container = document.getElementById('q-progress');
+            container.innerHTML = '';
+            for (let i = 0; i < TOTAL; i++) {
+                const dot = document.createElement('span');
+                dot.className = 'q-dot';
+                if (i < current) dot.classList.add('done');
+                if (i === current) dot.classList.add('active');
+                container.appendChild(dot);
+            }
+        }
+
         function renderQuestion() {
             const q = questions[current];
-            document.getElementById('q-num').textContent = `${current + 1}/${TOTAL}`;
-            document.getElementById('q-bar-fill').style.width = `${(current / TOTAL) * 100}%`;
+            document.getElementById('q-phase').textContent = `第 ${current + 1} 题 · 共 ${TOTAL} 题`;
             document.getElementById('q-text').textContent = q.text;
 
             const container = document.getElementById('q-options');
@@ -816,6 +838,9 @@
                 btn.addEventListener('click', () => selectOption(idx));
                 container.appendChild(btn);
             });
+
+            renderDots();
+
             container.style.animation = 'none';
             container.offsetHeight;
             container.style.animation = 'fadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
@@ -840,7 +865,7 @@
             const maxKey = sorted[0][0];
             const p = personalities[maxKey];
 
-            document.getElementById('result-avatar').src = avatars[maxKey];
+            document.getElementById('result-img').src = avatars[maxKey];
             document.getElementById('result-name').textContent = p.name;
             document.getElementById('result-subtitle').textContent = p.sub;
             document.getElementById('result-desc').textContent = p.desc;
@@ -855,7 +880,6 @@
                 tags.appendChild(tag);
             });
 
-            document.getElementById('q-bar-fill').style.width = '100%';
             showScreen('result-screen');
         }
 
