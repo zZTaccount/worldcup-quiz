@@ -1214,11 +1214,16 @@
         const COUNTER_OFFSET = 1000;
 
         (async function loadCounter() {
+            const el = document.getElementById('intro-counter');
+            const cacheKey = 'wcq_counter';
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) el.textContent = '已有 ' + Number(cached).toLocaleString() + ' 人测过';
             try {
                 const res = await fetch('https://api.counterapi.dev/v1/' + COUNTER_NS + '/visits/up');
                 const data = await res.json();
                 const count = (data.count || 0) + COUNTER_OFFSET;
-                document.getElementById('intro-counter').textContent = '已有 ' + count.toLocaleString() + ' 人测过';
+                el.textContent = '已有 ' + count.toLocaleString() + ' 人测过';
+                localStorage.setItem(cacheKey, count);
             } catch(e) {}
         })();
     </script>
